@@ -2,7 +2,7 @@
 # @Author: ashayaan
 # @Date:   2020-04-10 20:41:14
 # @Last Modified by:   ashayaan
-# @Last Modified time: 2020-04-10 21:25:20
+# @Last Modified time: 2020-04-19 17:11:48
 
 import numpy as np
 import pandas as pd
@@ -43,11 +43,15 @@ class DataReader(object):
 		print(self.data.head())
 
 	def saveData(self):
+		for i in self.ticker:
+			name = '../data/' + i+ '.csv'
+			print(name)
+			self.frames[i].to_csv(name)
 		self.data.dropna(inplace=True)
 		self.data.to_csv('../data/merged_data.csv',index=False)
 
 if __name__ == '__main__':
-	ticker = ['AAPL','V']
+	ticker = ['MSFT', 'MA', 'CSCO', 'AAPL', 'INTC', 'JNJ', 'UNH', 'MRK', 'PFE', 'JPM', 'BRK-B', 'BAC', 'WFC', 'VZ', 'GOOG','T', 'NFLX', 'AMZN', 'HD', 'MCD', 'NKE']
 	test = DataReader(ticker)
 	test.readData()
 	test.clipData()
