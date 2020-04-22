@@ -57,25 +57,26 @@ class DataProcessing(object):
 		self.trained_models = self.getModels(path)
 
 	def getModels(self,path):
-		name = ['SBI','LUPIN','CIPLA','KOTAK','LARSON','TATASTEEL','WIPRO','BOSCH','JINDAL','SUN','BHEL','HDFC','INFY','TATAPOWER']
+		name = ['MA','AMZN','BAC','MRK','WFC','INTC','T','GOOG','HD','CSCO','PFE','VZ','UNH','NKE','NFLX','JNJ','BRK-B','MCD','AAPL','JPM','MSFT']
+
 		models = []
-		print "---------------------------------------------"
-		print "Loading Saved Models"
-		print "---------------------------------------------\n"
+		print ("---------------------------------------------")
+		print ("Loading Saved Models")
+		print ("---------------------------------------------\n")
 		
 		for n in name:
 			model_name = str(path)+'/model_'+n+'.pt'
 			temp = Network(input_size)
-			print model_name
+			print (model_name)
 			temp.load_state_dict(torch.load(model_name))
 			temp.eval()
 			models.append(temp)		
 		return models
 
 	def trainingData(self):
-		print "\n---------------------------------------------"
-		print "Loading Training Data"
-		print "---------------------------------------------\n"
+		print ("\n---------------------------------------------")
+		print ("Loading Training Data")
+		print ("---------------------------------------------\n")
 		attributes = []
 		target = []
 		#Creating Window
@@ -91,21 +92,22 @@ class DataProcessing(object):
 			x = x.T
 			
 			predicted = [] 
+
 			#Predicting next and concatenating
 			for	j in range(len(x)):
-				normalization_factor = 1
-				if j in[0,1,2,3,6,8,9,10,12,13]:
-					normalization_factor = 10
-				elif j in [4,5,11]:
-					normalization_factor = 50
-				else:
-					normalization_factor = 250
+				normalization_factor = 10
+				# if j in[0,1,2,3,6,8,9,10,12,13]:
+				# 	normalization_factor = 10
+				# elif j in [4,5,11]:
+				# 	normalization_factor = 50
+				# else:
+				# 	normalization_factor = 250
 
 				input_data = torch.from_numpy(x[j]/normalization_factor).float()
 				pred = self.trained_models[j].forward(input_data) * normalization_factor
 				predicted.append(pred.item())
 			
-			x = np.concatenate((x,np.array(predicted).reshape(14,1)),axis=1).reshape(1,14,6)
+			x = np.concatenate((x,np.array(predicted).reshape(21,1)),axis=1).reshape(1,21,6)
 
 			attributes.append(x)
 			target.append(y)
@@ -114,9 +116,9 @@ class DataProcessing(object):
 
 
 	def testingData(self):
-		print "\n---------------------------------------------"
-		print "Loading Testing Data"
-		print "---------------------------------------------\n"
+		print ("\n---------------------------------------------")
+		print ("Loading Testing Data")
+		print ("---------------------------------------------\n")
 		attributes = []
 		target = []
 
@@ -134,13 +136,13 @@ class DataProcessing(object):
 			predicted = [] 
 			#Predicting next and concatenating
 			for	j in range(len(x)):
-				normalization_factor = 1
-				if j in[0,1,2,3,6,8,9,10,12,13]:
-					normalization_factor = 10
-				elif j in [4,5,11]:
-					normalization_factor = 50
-				else:
-					normalization_factor = 250
+				normalization_factor = 10
+				# if j in[0,1,2,3,6,8,9,10,12,13]:
+				# 	normalization_factor = 10
+				# elif j in [4,5,11]:
+				# 	normalization_factor = 50
+				# else:
+				# 	normalization_factor = 250
 
 				input_data = torch.from_numpy(x[j]/normalization_factor).float()
 				pred = self.trained_models[j].forward(input_data) * normalization_factor
@@ -159,7 +161,7 @@ if __name__ == '__main__':
 	x = DataProcessing('../data/combined2.csv',0.8,'../saved_models')
 	attributes,target = x.testingData()
 	
-	print attributes[-1]
+	print (attributes[-1])
 	# print attributes[0]
 	# print target[0:1].shape
 	# print attributes[430:440]

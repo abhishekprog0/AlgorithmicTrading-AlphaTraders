@@ -6,6 +6,8 @@ import visdom
 import argparse
 import pandas as pd
 import numpy as np
+import os
+import glob
 
 from model_params import input_size
 from model_params import sequence_size
@@ -17,6 +19,8 @@ from model_params import batch_size
 from model import Network
 from utils import Plotter
 from utils import DataProcessing
+
+
 
 class Train(nn.Module):
 	def __init__(self):
@@ -47,7 +51,7 @@ def getBatch(net,data,target,batch):
 	y = y.view(y.shape[0],1)
 	return x,y
 
-def trainNetwork(net,data,target,epoch):
+def trainNetwork(net,data,target,epoch,n):
 	num_batches = (len(data)//net.batch_size)
 	total_loss = 0
 	for batch in range(num_batches):
@@ -62,34 +66,42 @@ def trainNetwork(net,data,target,epoch):
 
 		total_loss +=loss.item()
 	
-		if epoch == 74:
-			print out*10
+		if epoch == 99:
+			print (out*10)
 
-	print('Epoch: {} LOSS: {}'.format(epoch, total_loss/num_batches))
-	plotter.plot('Loss', 'Train', 'SBI2 Training Loss', epoch, total_loss/num_batches)
+	print('Name: {} Epoch: {} LOSS: {}'.format(n,epoch, total_loss/num_batches))
+	plotter.plot('Loss', 'Train', n, epoch, total_loss/num_batches)
 
 	return net
 	
 
 
 if __name__ == '__main__':
-	global plotter
-	plotter = Plotter(env_name='Thesis Project')
-
-	parser = argparse.ArgumentParser()
-	parser.add_argument("--datapath", type=str, default="../data", help="path to the dataset")
-	parser.add_argument("--file", type=str, default="combined2.csv")
-	args = parser.parse_args()
-	file_name = args.datapath + '/' + args.file
-
-	data = DataProcessing(file_name,train_size)
-	train_data,train_target = data.trainingData()
-
-
-	net = Train()
-
-	for epoch in range(num_epochs):
-		net = trainNetwork(net,train_data,train_target,epoch)
-
-	torch.save(net.network.state_dict(),'../saved_models/model_JINDAL.pt')
+	# parser = argparse.ArgumentParser()
+	# parser.add_argument("--datapath", type=str, default="../data", help="path to the dataset")
+	# parser.add_argument("--file", type=str, default="combined2.csv")
+	# args = parser.parse_args()
+	# file_name = args.datapath + '/' + args.file
 	
+	path = '../data/*.csv'
+
+	for fname in glob.glob(path):
+		global plotter
+		plotter = Plotter(env_name='Algo Trading Project')
+		print (fname)
+		data = DataProcessing(fname,train_size)
+
+		train_data,train_target = data.trainingData()
+
+		net = Train()
+		n = fname.split('/')[-1].split('.')[0]
+		
+		for epoch in range(num_epochs):
+			net = trainNetwork(net,train_data,train_target,epoch,n)
+
+		if os.path.isdir('../saved_models') == False:
+			os.mkdir('../saved_models')
+		
+		torch.save(net.network.state_dict(),'../saved_models/model_'+n+'.pt')
+		del net
+		del plotter

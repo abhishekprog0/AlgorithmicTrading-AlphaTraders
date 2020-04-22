@@ -97,7 +97,7 @@ def trainNetwork(net,train_data,train_target,iterations):
 		# print net.wealth*torch.exp(-1*loss.item())
 		net.updateSummary(loss.item())
 		plotter.plot('Wealth', 'iterations', 'Policy Wealth', iterations, net.wealth)
-		print('Iteration:{} Wealth:{}').format(iterations, net.wealth)
+		print(iterations, net.wealth)
 	print('Wealth:{} Loss:{}').format(net.wealth,net.loss/num_batches)
 	return net
 
@@ -143,10 +143,10 @@ def calculateSharpeRation(net,winner,loser,ucrp):
 	sharpe_ratio_loser = ((statistics.mean(loser.return_history)-1)/100)/statistics.stdev(loser.return_history)	
 	sharpe_ratio_ucrp = ((statistics.mean(ucrp.return_history)-1)/100)/statistics.stdev(ucrp.return_history)	
 
-	print sharpe_ratio_net
-	print sharpe_ratio_winner
-	print sharpe_ratio_loser
-	print sharpe_ratio_ucrp
+	print (sharpe_ratio_net)
+	print (sharpe_ratio_winner)
+	print (sharpe_ratio_loser)
+	print (sharpe_ratio_ucrp)
 
 
 if __name__ == '__main__':
@@ -158,8 +158,8 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--mode", type=str, default='train', help='Please select mode training or test')
-	parser.add_argument("--datapath", type=str, default="../data", help="path to the dataset")
-	parser.add_argument("--file", type=str, default="combined2.csv", help='Please give path to the data files')
+	parser.add_argument("--datapath", type=str, default="../data/combined", help="path to the dataset")
+	parser.add_argument("--file", type=str, default="combined.csv", help='Please give path to the data files')
 	parser.add_argument("--models", type=str, default="../saved_models", help="path to the dataset")
 	args = parser.parse_args()
 	file_name = args.datapath + '/' + args.file
@@ -177,9 +177,9 @@ if __name__ == '__main__':
 		train_data, train_target = data.trainingData()
 
 		for epoch in range(net.epochs):
-			print '--------------------------'
-			print('Epoch: {}').format(epoch+1)
-			print '-------------------------'
+			print ('--------------------------')
+			print('Epoch: '+ str(epoch+1))
+			print ('-------------------------')
 			net = trainNetwork(net,train_data,train_target,iterations)
 			net.reset()
 			net.network.resetBuffer()	
@@ -189,17 +189,17 @@ if __name__ == '__main__':
 	#Testing the model
 	elif mode == 'test':
 		try:
-			print"\n======================================="
-			print "             Loading model              "
-			print "========================================\n"
+			print ("\n=======================================")
+			print ("             Loading model              ")
+			print ("========================================\n")
 			net = Train(policy_learning_rate,input_channels)
 			net.network.load_state_dict(torch.load('../saved_models/policy_network.pt'))
 			loser = Loser(bench_mark_output_size)
 			winner = Winner(bench_mark_output_size)
 			ucrp = UCRP(bench_mark_output_size)
 		except Exception as e:
-			print e
-			print 'Please give the correct path to the saved model'
+			print (e)
+			print ('Please give the correct path to the saved model')
 			
 		test_data, test_target = data.testingData()
 
