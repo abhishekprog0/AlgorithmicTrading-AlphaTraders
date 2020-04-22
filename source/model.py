@@ -39,6 +39,6 @@ class Network(nn.Module):
 
 '''Testing the network'''
 if __name__ == '__main__':
-	x = torch.randn((99,10))
+	x = torch.randn((5))
 	test = Network(input_size)
-	print test.forward(x).shape
+	print (test.forward(x).shape)

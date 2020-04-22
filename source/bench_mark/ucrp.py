@@ -50,7 +50,7 @@ class UCRP():
 if __name__ == '__main__':
 	test = UCRP(14)
 	out = test.predict()
-	print out
+	print (out)
 	p_weights = test.weight_buffer[-1]
 	loss = test.loss_function(p_weights,out,torch.randn(14))
 	test.updateSummary(loss)

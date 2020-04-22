@@ -51,5 +51,5 @@ if __name__ == '__main__':
 	p_weights = test.weight_buffer[-1]
 	loss = test.loss_function(p_weights,out,torch.randn(14))
 	test.updateSummary(loss)
-	print test.weight_buffer
+	print (test.weight_buffer)
 
