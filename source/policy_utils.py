@@ -94,15 +94,8 @@ class DataProcessing(object):
 			predicted = [] 
 
 			#Predicting next and concatenating
+			normalization_factor = 10
 			for	j in range(len(x)):
-				normalization_factor = 10
-				# if j in[0,1,2,3,6,8,9,10,12,13]:
-				# 	normalization_factor = 10
-				# elif j in [4,5,11]:
-				# 	normalization_factor = 50
-				# else:
-				# 	normalization_factor = 250
-
 				input_data = torch.from_numpy(x[j]/normalization_factor).float()
 				pred = self.trained_models[j].forward(input_data) * normalization_factor
 				predicted.append(pred.item())

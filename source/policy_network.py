@@ -33,19 +33,15 @@ class PolicyNetwork(nn.Module):
 
 	def forward(self,data,w_previous):
 		out = self.relu(self.conv1(data))
-		print (out.shape)
 		out = self.relu(self.conv2(out))
-		print (out.shape)
 		#Adding the previous weight vector for better learning
 		w_previous = w_previous.view(-1,1,21,1)
 		out = torch.cat((out,w_previous),1)
 		out = self.relu(self.conv3(out))
-		print (out.shape)
 		#Flattening features to feed in linear layer
 		out = out.view(-1,self.num_flatten_features(out))
 		out = self.softmax(self.layer1(out))
 		self.weight_buffer.append(out)
-		print (out.shape)
 		return out
 
 if __name__ == '__main__':

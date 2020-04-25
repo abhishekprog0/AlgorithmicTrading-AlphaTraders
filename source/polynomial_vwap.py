@@ -2,7 +2,7 @@
 # @Author: ashayaan
 # @Date:   2020-04-22 16:24:02
 # @Last Modified by:   ashayaan
-# @Last Modified time: 2020-04-22 16:42:30
+# @Last Modified time: 2020-04-22 18:40:26
 
 import pandas as pd
 import numpy as np
@@ -45,13 +45,13 @@ def VWAP_calc(ticker,capital,df_t):
 	St = []
 	S_t = []
 	
-	for d in D[:-1]:
+	for d in D[:1]:
 		i=-1
 		s=[]
 		T=[]
 		df_d=df_t[df_t['DATE']==d]
-		
-		for j in range(len(df_d['TIME_M'])):
+		print (d)
+		for j in range(len(df_d['TIME_M']))[:100]:
 			
 			if len(T)>0 and (int(np.array(df_d['TIME_M'])[j][-15:-13])-int(T[-1][-2:]))>1:
 					s.append(0)
@@ -65,21 +65,24 @@ def VWAP_calc(ticker,capital,df_t):
 		
 		if '9:30' not in T:
 			s=[0]+s
-			
-		if len(s)==30:
+		
+		if len(s)==36:
 			St+=s
 			S_t.append(s)
-	
+			
 	St=np.array(St,dtype=float)
 	S_t=np.array(S_t,dtype=float)
 	
+
+	
+
 	for i in range(len(S_t)):
 		S_t[i,:]=S_t[i,:]/float(np.sum(S_t[i,:]))
 	hist_mean=np.mean(S_t,axis=0)
 	T=[]
 	
-	for i in range(int(len(St)/30)):
-		for j in range(30):
+	for i in range(int(len(St)/36)):
+		for j in range(36):
 			T.append(j)
 	T=np.array(T)
 	#print(T)
@@ -89,11 +92,13 @@ def VWAP_calc(ticker,capital,df_t):
 		t=T[i]
 		X.append([t,t**2,t**3,t**4,t**5])
 	X=np.array(X)
+
+
+
 	regr = linear_model.LinearRegression()
 
 	# Train the model using the training sets
-	print(X)
-	print(St)
+	print('Fitting Regression')
 	regr.fit(X,St)
 	pred_vol=regr.predict(X[:30,:])
 	
@@ -188,12 +193,12 @@ if __name__ == '__main__':
 
 	tickers = ['AAPL']
 
-	df=pd.read_csv('../data/5bcaadbfce65b326_csv.zip',header=0)
-	df = df.rename(columns={"SYMBOL": "SYM_ROOT", "TIME": "TIME_M"})
+	df=pd.read_csv('../data/e4733b5baa1d0556_csv.zip',header=0)
 	
 	print(df.head())
 
 	for i in tickers:
+		print(i)
 		record=VWAP_calc(i,100000,df)
 		IS=record[-1]
 		IS2=record[-2]
@@ -204,67 +209,67 @@ if __name__ == '__main__':
 
 
 
-	# print('Period Theoretical Return:'+str(0.0836137916348646))
-	# print('Historic mean Shortfall:'+str(np.mean(shortfall2)))
-	# print('Fitted mean Shortfall:'+str(np.mean(shortfall)))
-	# print('Benchmark Shortfall:'+str(np.mean(benchmark_sf)))
+	print('Period Theoretical Return:'+str(0.0836137916348646))
+	print('Historic mean Shortfall:'+str(np.mean(shortfall2)))
+	print('Fitted mean Shortfall:'+str(np.mean(shortfall)))
+	print('Benchmark Shortfall:'+str(np.mean(benchmark_sf)))
 
 
-	# try:    
-	# 	df_t=df[df['SYM_ROOT']==L[1]]
-	# 	D=list(set(df_t['DATE']))
-	# 	St=[]
-	# 	S_t=[]
-	# 	for d in D[:-1]:
-	# 		i=-1
-	# 		s=[]
-	# 		T=[]
-	# 		df_d=df_t[df_t['DATE']==d]
-	# 		for j in range(len(df_d['TIME_M'])):
+	try:    
+		df_t=df[df['SYM_ROOT']==L[1]]
+		D=list(set(df_t['DATE']))
+		St=[]
+		S_t=[]
+		for d in D[:-1]:
+			i=-1
+			s=[]
+			T=[]
+			df_d=df_t[df_t['DATE']==d]
+			for j in range(len(df_d['TIME_M'])):
 				
-	# 			if len(T)>0 and (int(np.array(df_d['TIME_M'])[j][-15:-13])-int(T[-1][-2:]))>1:
-	# 					s.append(0)
+				if len(T)>0 and (int(np.array(df_d['TIME_M'])[j][-15:-13])-int(T[-1][-2:]))>1:
+						s.append(0)
 					   
-	# 			if np.array(df_d['TIME_M'])[j][:-13] not in T:
-	# 				i+=1
-	# 				T.append(np.array(df_d['TIME_M'])[j][:-13])
-	# 				s.append(np.array(df_d['SIZE'])[j])
-	# 			else:
-	# 				s[i]+=np.array(df_d['SIZE'])[j]
-	# 		if '9:30' not in T:
-	# 			s=[0]+s
+				if np.array(df_d['TIME_M'])[j][:-13] not in T:
+					i+=1
+					T.append(np.array(df_d['TIME_M'])[j][:-13])
+					s.append(np.array(df_d['SIZE'])[j])
+				else:
+					s[i]+=np.array(df_d['SIZE'])[j]
+			if '9:30' not in T:
+				s=[0]+s
 				
-	# 		if len(s)==30:
-	# 			St+=s
-	# 			S_t.append(s)
-	# 	St=np.array(St,dtype=float)
-	# 	S_t=np.array(S_t,dtype=float)
-	# 	for i in range(len(S_t)):
-	# 		S_t[i,:]=S_t[i,:]/float(np.sum(S_t[i,:]))
-	# 	T=[]
-	# 	for i in range(int(len(St)/30)):
-	# 		for j in range(30):
-	# 			T.append(j)
-	# 	T=np.array(T)
-	# 	#print(T)
-	# 	X=[]
-	# 	for i in range(len(T)):
-	# 		t=T[i]
-	# 		X.append([t,t**2,t**3,t**4,t**5])
-	# 	X=np.array(X)
-	# 	regr = linear_model.LinearRegression()
+			if len(s)==30:
+				St+=s
+				S_t.append(s)
+		St=np.array(St,dtype=float)
+		S_t=np.array(S_t,dtype=float)
+		for i in range(len(S_t)):
+			S_t[i,:]=S_t[i,:]/float(np.sum(S_t[i,:]))
+		T=[]
+		for i in range(int(len(St)/30)):
+			for j in range(30):
+				T.append(j)
+		T=np.array(T)
+		#print(T)
+		X=[]
+		for i in range(len(T)):
+			t=T[i]
+			X.append([t,t**2,t**3,t**4,t**5])
+		X=np.array(X)
+		regr = linear_model.LinearRegression()
 
-	# 	# Train the model using the training sets
-	# 	regr.fit(X,St)
-	# 	pred_vol=regr.predict(X[:30,:])
+		# Train the model using the training sets
+		regr.fit(X,St)
+		pred_vol=regr.predict(X[:30,:])
 		
-	# 	pred_mean=pred_vol/np.sum(pred_vol)
-	# 	vol_mean=np.mean(S_t,axis=0)
-	# except:
-	# 	pass
+		pred_mean=pred_vol/np.sum(pred_vol)
+		vol_mean=np.mean(S_t,axis=0)
+	except:
+		pass
 
 
-	# get_ipython().run_line_magic('matplotlib', 'inline')
+	get_ipython().run_line_magic('matplotlib', 'inline')
 
-	# plot_cumper(S_t,vol_mean,pred_mean,L[1])
+	plot_cumper(S_t,vol_mean,pred_mean,L[1])
 

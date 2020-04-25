@@ -8,6 +8,7 @@ import torch.optim as optim
 import argparse
 import math
 import statistics
+import pickle
 
 from bench_mark.loser import Loser
 from bench_mark.winner import Winner
@@ -28,6 +29,8 @@ from model_params import policy_batch_size as batch_size
 from model_params import transaction_commission
 from model_params import bench_mark_output_size
 
+import strategy
+
 class Train(nn.Module):
 	def __init__(self,learning_rate,input_channels):
 		super(Train,self).__init__()
@@ -42,7 +45,7 @@ class Train(nn.Module):
 
 
 	def reset(self):
-		self.wealth = 10e4
+		self.wealth = 1e6
 		self.loss = 0
 		self.total_reward = 0
 		self.wealth_history = []
@@ -69,13 +72,13 @@ class Train(nn.Module):
 		return x,y
 
 	def loss_function(self,w1,w2,y):
-		transaction_cost = 1 - torch.sum(torch.abs(w2-w1))*transaction_commission
+		transaction_cost = 1-torch.sum(torch.abs(w2-w1))*transaction_commission
 		portfolio_return = torch.sum(w2*y)
 		loss = -1 * torch.log(portfolio_return*transaction_cost)
 		loss = torch.mean(loss)
 		return loss
 
-def trainNetwork(net,train_data,train_target,iterations):
+def trainNetwork(net,train_data,train_target,iterations,data):
 	num_batches = (len(train_data)//net.batch_size)
 	for batch in range(num_batches):
 		iterations+=1
@@ -85,7 +88,6 @@ def trainNetwork(net,train_data,train_target,iterations):
 		#Forward Propagation
 		previous_weights = net.network.weight_buffer[-1]
 		new_weights = net.network.forward(x,previous_weights)
-
 		#Calculating Loss
 		loss = net.loss_function(previous_weights,new_weights,y)
 		
@@ -96,9 +98,13 @@ def trainNetwork(net,train_data,train_target,iterations):
 
 		# print net.wealth*torch.exp(-1*loss.item())
 		net.updateSummary(loss.item())
+
+		strategy_data = {'old':previous_weights.clone(),'new':new_weights.clone(),'wealth':net.wealth}
+		strategy.executeTrade(strategy_data,data.df.iloc[iterations+3].values)
+
 		plotter.plot('Wealth', 'iterations', 'Policy Wealth', iterations, net.wealth)
 		print(iterations, net.wealth)
-	print('Wealth:{} Loss:{}').format(net.wealth,net.loss/num_batches)
+	# print('Wealth:{} Loss:{}').format(net.wealth,net.loss/num_batches)
 	return net
 
 
@@ -180,9 +186,16 @@ if __name__ == '__main__':
 			print ('--------------------------')
 			print('Epoch: '+ str(epoch+1))
 			print ('-------------------------')
-			net = trainNetwork(net,train_data,train_target,iterations)
+			net = trainNetwork(net,train_data,train_target,iterations,data)
+			#saving wealth history
+			try:
+				with open('wealth.pkl','wb') as f:
+					pickle.dump(net.wealth_history,f)
+			except Exception as e:
+				pass
 			net.reset()
 			net.network.resetBuffer()	
+				
 
 		torch.save(net.network.state_dict(),'../saved_models/policy_network.pt')
 
