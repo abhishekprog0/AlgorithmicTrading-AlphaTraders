@@ -14,7 +14,7 @@ class UCRP():
 		self.reset()
 
 	def reset(self):
-		self.wealth = 10e4
+		self.wealth = 1e6
 		self.wealth_history = []
 		self.return_history = []		
 

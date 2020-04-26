@@ -32,10 +32,10 @@ def combineFiles(data_frames):
 	# combined.rename(columns={'SBI_Historical_Data':'Date'},inplace = True)
 
 
-	combined.to_csv('back_test_2.csv',index = False)
+	combined.to_csv('../data/combined/back_test_2.csv',index = False)
 
 if __name__ == '__main__':
-	path = '../data'
+	path = '../data/trade_data/'
 	files = getFilesName(path)
 
 	data_frames = readFiles(files)	

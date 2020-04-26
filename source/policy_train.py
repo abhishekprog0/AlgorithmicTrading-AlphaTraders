@@ -29,7 +29,7 @@ from model_params import policy_batch_size as batch_size
 from model_params import transaction_commission
 from model_params import bench_mark_output_size
 
-import strategy
+from strategy import ExecuteTrade
 
 class Train(nn.Module):
 	def __init__(self,learning_rate,input_channels):
@@ -78,7 +78,7 @@ class Train(nn.Module):
 		loss = torch.mean(loss)
 		return loss
 
-def trainNetwork(net,train_data,train_target,iterations,data):
+def trainNetwork(net,train_data,train_target,iterations):
 	num_batches = (len(train_data)//net.batch_size)
 	for batch in range(num_batches):
 		iterations+=1
@@ -99,8 +99,9 @@ def trainNetwork(net,train_data,train_target,iterations,data):
 		# print net.wealth*torch.exp(-1*loss.item())
 		net.updateSummary(loss.item())
 
-		strategy_data = {'old':previous_weights.clone(),'new':new_weights.clone(),'wealth':net.wealth}
-		strategy.executeTrade(strategy_data,data.df.iloc[iterations+3].values)
+		# strategy_data = {'old':previous_weights.clone(),'new':new_weights.clone(),'wealth':net.wealth}
+		# exec_trade.executeTrade(strategy_data,data.df.iloc[iterations+3].values)
+		# print(exec_trade.trade)
 
 		plotter.plot('Wealth', 'iterations', 'Policy Wealth', iterations, net.wealth)
 		print(iterations, net.wealth)
@@ -108,8 +109,9 @@ def trainNetwork(net,train_data,train_target,iterations,data):
 	return net
 
 
-def backTest(net,winner,loser,ucrp,test_data,test_target,iterations):
+def backTest(net,winner,loser,ucrp,test_data,test_target,iterations,data,exec_trade):
 	num_batches = (len(test_data)//net.batch_size)
+
 	for batch in range(num_batches):
 		iterations += 1
 
@@ -120,6 +122,9 @@ def backTest(net,winner,loser,ucrp,test_data,test_target,iterations):
 		new_weights = net.network.forward(x,previous_weights)
 		policy_loss = net.loss_function(previous_weights,new_weights,y)
 		net.updateSummary(policy_loss.item())
+		strategy_data = {'old':previous_weights.clone(),'new':new_weights.clone(),'wealth':net.wealth}
+		exec_trade.executeTrade(strategy_data,data.df.iloc[iterations+3].values)
+		exec_trade.vwap()
 
 		#Follow the winner
 		winner_previous_weights = winner.weight_buffer[-1]
@@ -173,8 +178,8 @@ if __name__ == '__main__':
 	
 	#Data utility object
 	# data = DataProcessing(file_name,train_size,args.models)
-	data = DataProcessing(file_name,0.8,args.models)
-
+	data = DataProcessing(file_name,0.0,args.models)
+	exec_trade = ExecuteTrade()
 	iterations = 0
 
 	#Training model
@@ -186,7 +191,7 @@ if __name__ == '__main__':
 			print ('--------------------------')
 			print('Epoch: '+ str(epoch+1))
 			print ('-------------------------')
-			net = trainNetwork(net,train_data,train_target,iterations,data)
+			net = trainNetwork(net,train_data,train_target,iterations)
 			#saving wealth history
 			try:
 				with open('wealth.pkl','wb') as f:
@@ -216,7 +221,7 @@ if __name__ == '__main__':
 			
 		test_data, test_target = data.testingData()
 
-		backTest(net,winner,loser,ucrp,test_data,test_target,iterations)
+		backTest(net,winner,loser,ucrp,test_data,test_target,iterations,data,exec_trade)
 
-		calculateSharpeRation(net,winner,loser,ucrp)
+		# calculateSharpeRation(net,winner,loser,ucrp)
 		

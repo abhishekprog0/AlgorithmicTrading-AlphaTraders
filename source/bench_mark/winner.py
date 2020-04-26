@@ -9,16 +9,16 @@ from model_params import transaction_commission
 class Winner():
 	def __init__(self,output_size):
 		self.dim = output_size
-		self.weight_buffer = list(torch.zeros(1,14))
+		self.weight_buffer = list(torch.zeros(1,20))
 		self.reset()
 
 	def reset(self):
-		self.wealth = 10e4
+		self.wealth = 1e6
 		self.wealth_history = []
 		self.return_history = []		
 
 	def resetBuffer(self):
-		self.weight_buffer = list(torch.zeros(1,14))
+		self.weight_buffer = list(torch.zeros(1,20))
 
 	def updateSummary(self,loss):
 		reward = -1 * loss
@@ -45,10 +45,10 @@ class Winner():
 '''Unit testing the file'''
 
 if __name__ == '__main__':
-	test = Winner(14)
-	data = torch.randn(1,1,14,6)
+	test = Winner(20)
+	data = torch.randn(1,1,20,6)
 	out = test.predict(data)
 	p_weights = test.weight_buffer[-1]
-	loss = test.loss_function(p_weights,out,torch.randn(14))
+	loss = test.loss_function(p_weights,out,torch.randn(20))
 	test.updateSummary(loss)
 	# print math.exp(loss)

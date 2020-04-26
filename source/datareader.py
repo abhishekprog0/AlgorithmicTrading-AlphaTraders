@@ -2,7 +2,7 @@
 # @Author: ashayaan
 # @Date:   2020-04-10 20:41:14
 # @Last Modified by:   ashayaan
-# @Last Modified time: 2020-04-19 17:11:48
+# @Last Modified time: 2020-04-25 21:33:49
 
 import numpy as np
 import pandas as pd
@@ -15,8 +15,8 @@ class DataReader(object):
 		super(DataReader, self).__init__()
 		self.ticker = ticker
 		self.frames = {}
-		self.start = datetime.datetime(2000,1,1)	
-		self.end = datetime.datetime(2019,6,30)
+		self.start = datetime.datetime(2019,7,2)	
+		self.end = datetime.datetime(2019,7,12)
 		self.minDate = datetime.datetime(2000,1,1)
 
 	def readData(self):
@@ -44,14 +44,14 @@ class DataReader(object):
 
 	def saveData(self):
 		for i in self.ticker:
-			name = '../data/' + i+ '.csv'
+			name = '../data/trade_data/' + i+ '.csv'
 			print(name)
 			self.frames[i].to_csv(name)
-		self.data.dropna(inplace=True)
-		self.data.to_csv('../data/merged_data.csv',index=False)
+		# self.data.dropna(inplace=True)
+		# self.data.to_csv('../data/merged_data.csv',index=False)
 
 if __name__ == '__main__':
-	ticker = ['MSFT', 'MA', 'CSCO', 'AAPL', 'INTC', 'JNJ', 'UNH', 'MRK', 'PFE', 'JPM', 'BRK-B', 'BAC', 'WFC', 'VZ', 'GOOG','T', 'NFLX', 'AMZN', 'HD', 'MCD', 'NKE']
+	ticker = ['MSFT', 'MA', 'CSCO', 'AAPL', 'INTC', 'JNJ', 'UNH', 'MRK', 'PFE', 'JPM', 'BAC', 'WFC', 'VZ', 'GOOG','T', 'NFLX', 'AMZN', 'HD', 'MCD', 'NKE']
 	test = DataReader(ticker)
 	test.readData()
 	test.clipData()

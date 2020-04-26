@@ -9,16 +9,16 @@ from model_params import transaction_commission
 class UCRP():
 	def __init__(self,output_size):
 		self.dim = output_size
-		self.weight_buffer = list(torch.zeros(1,14))
+		self.weight_buffer = list(torch.zeros(1,20))
 		self.reset()
 
 	def reset(self):
-		self.wealth = 10e4
+		self.wealth = 1e6
 		self.wealth_history = []
 		self.return_history = []		
 
 	def resetBuffer(self):
-		self.weight_buffer = list(torch.zeros(1,14))
+		self.weight_buffer = list(torch.zeros(1,20))
 
 	def updateSummary(self,loss,iteration):
 		reward = -1 * loss
@@ -48,10 +48,10 @@ class UCRP():
 '''Unit testing the file'''
 
 if __name__ == '__main__':
-	test = UCRP(14)
+	test = UCRP(20)
 	out = test.predict()
 	print (out)
 	p_weights = test.weight_buffer[-1]
-	loss = test.loss_function(p_weights,out,torch.randn(14))
+	loss = test.loss_function(p_weights,out,torch.randn(20))
 	test.updateSummary(loss)
 	# print math.exp(loss)

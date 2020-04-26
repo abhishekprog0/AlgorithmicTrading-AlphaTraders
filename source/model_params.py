@@ -10,7 +10,7 @@ learning_rate = 1e-5
 
 
 #Policy Network Parameters
-bench_mark_output_size = 14
+bench_mark_output_size = 20
 input_channels = 1
 epochs = 1
 window_size = 5

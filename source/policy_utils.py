@@ -57,7 +57,7 @@ class DataProcessing(object):
 		self.trained_models = self.getModels(path)
 
 	def getModels(self,path):
-		name = ['MA','AMZN','BAC','MRK','WFC','INTC','T','GOOG','HD','CSCO','PFE','VZ','UNH','NKE','NFLX','JNJ','BRK-B','MCD','AAPL','JPM','MSFT']
+		name = ['MA','AMZN','BAC','MRK','WFC','INTC','T','GOOG','HD','CSCO','PFE','VZ','UNH','NKE','NFLX','JNJ','MCD','AAPL','JPM','MSFT']
 
 		models = []
 		print ("---------------------------------------------")
@@ -100,7 +100,7 @@ class DataProcessing(object):
 				pred = self.trained_models[j].forward(input_data) * normalization_factor
 				predicted.append(pred.item())
 			
-			x = np.concatenate((x,np.array(predicted).reshape(21,1)),axis=1).reshape(1,21,6)
+			x = np.concatenate((x,np.array(predicted).reshape(20,1)),axis=1).reshape(1,20,6)
 
 			attributes.append(x)
 			target.append(y)
@@ -116,7 +116,8 @@ class DataProcessing(object):
 		target = []
 
 		#Creating Window
-		for i in range( (len(self.test_data)//self.window)*self.window - self.window - 1 ):
+
+		for i in range( (len(self.test_data)//self.window)):
 			#X is the price tensor that contains the history of the market
 			#Y is the relative price vector i.e vt/vt-1
 			x = np.array(self.test_data.iloc[i:i+self.window],np.float64)
@@ -141,7 +142,7 @@ class DataProcessing(object):
 				pred = self.trained_models[j].forward(input_data) * normalization_factor
 				predicted.append(pred.item())
 			
-			x = np.concatenate((x,np.array(predicted).reshape(14,1)),axis=1).reshape(1,14,6)
+			x = np.concatenate((x,np.array(predicted).reshape(20,1)),axis=1).reshape(1,20,6)
 
 			attributes.append(x)
 			target.append(y)
