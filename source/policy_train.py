@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: ashayaan
+# @Date:   2020-04-25 22:20:45
+# @Last Modified by:   ashayaan
+# @Last Modified time: 2020-05-06 17:56:34
 import torch
 import torchvision
 import visdom
@@ -154,10 +159,10 @@ def calculateSharpeRation(net,winner,loser,ucrp):
 	sharpe_ratio_loser = ((statistics.mean(loser.return_history)-1)/100)/statistics.stdev(loser.return_history)	
 	sharpe_ratio_ucrp = ((statistics.mean(ucrp.return_history)-1)/100)/statistics.stdev(ucrp.return_history)	
 
-	print (sharpe_ratio_net)
-	print (sharpe_ratio_winner)
-	print (sharpe_ratio_loser)
-	print (sharpe_ratio_ucrp)
+	print (sharpe_ratio_net*np.sqrt(252*3))
+	print (sharpe_ratio_winner*np.sqrt(252*3))
+	print (sharpe_ratio_loser*np.sqrt(252*3))
+	print (sharpe_ratio_ucrp*np.sqrt(252*3))
 
 
 if __name__ == '__main__':
@@ -220,7 +225,8 @@ if __name__ == '__main__':
 			print ('Please give the correct path to the saved model')
 			
 		test_data, test_target = data.testingData()
-
+		test_data = test_data[:500,:,:,:]
+		test_target = test_target[:500]
 		backTest(net,winner,loser,ucrp,test_data,test_target,iterations,data,exec_trade)
 
 		# calculateSharpeRation(net,winner,loser,ucrp)

@@ -2,7 +2,7 @@
 # @Author: ashayaan
 # @Date:   2020-04-25 13:06:10
 # @Last Modified by:   ashayaan
-# @Last Modified time: 2020-04-25 22:30:29
+# @Last Modified time: 2020-04-29 21:51:18
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -40,10 +40,18 @@ def vwapExecute(trade_file,quote_file,order,side):
 	taq_merged = st.makeTAQfile(df_trade_2, df_quote)
 	taq_merged = taq_merged.between_time(start_time, end_time)
 
+
 	test = VWAP('train_data_2.pkl')
 	test.fitModel()
 	vwap_coefs = test.coef
 
 	order_quantity = order
 	order_side = side
-	results = vw.algo_loop(taq_merged, order_side, order_quantity, vwap_coefs,tick_coef=0.9)
+	results = vw.algo_loop(taq_merged, order_side, order_quantity, vwap_coefs,tick_coef=0.5)
+	
+	print("\n####################")
+	print("Average Price : {}".format(results['avg_price']))
+	print("Day VWAP : {}".format(results['avg_price']))
+	print("Passive and Aggressive trade")
+	print(results['trades'].groupby(['trade_type']).count())
+	print("####################\n")

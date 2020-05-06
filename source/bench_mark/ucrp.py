@@ -23,11 +23,6 @@ class UCRP():
 	def updateSummary(self,loss,iteration):
 		reward = -1 * loss
 		self.wealth = self.wealth * math.exp(reward)
-		if iteration <= 800:
-			if iteration%2:
-				self.wealth-=100
-			else:
-				self.wealth /= 1.0002
 		self.wealth_history.append(self.wealth)
 		self.return_history.append(math.exp(reward))
 

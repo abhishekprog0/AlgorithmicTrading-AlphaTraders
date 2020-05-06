@@ -2,7 +2,7 @@
 # @Author: ashayaan
 # @Date:   2020-04-25 13:57:44
 # @Last Modified by:   ashayaan
-# @Last Modified time: 2020-04-25 22:34:44
+# @Last Modified time: 2020-04-29 18:59:57
 
 
 import torch
@@ -45,19 +45,19 @@ class ExecuteTrade(object):
 			i+=1
 
 	def vwap(self):
-		i = 'MSFT'
-		trade_file = i+'_trade.zip'
-		quote_file = i+'_quote.zip'
+		for i in self.ticker:
+			trade_file = i+'_trade.zip'
+			quote_file = i+'_quote.zip'
 
-		print(self.trade)
-		order = self.trade[i][1]
-		side  = self.trade[i][0]
-		print('\n************************************')
-		print(i)
-		print(order)
-		print('************************************\n')
-		
-		vwapExecute(trade_file,quote_file,order,side)
+			# print(self.trade)
+			order = self.trade[i][1]
+			side  = self.trade[i][0]
+			print('\n************************************')
+			print(i)
+			print(order)
+			print('************************************\n')
+			
+			vwapExecute(trade_file,quote_file,order,side)
 
 
 #unit test
